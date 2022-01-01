@@ -1,5 +1,6 @@
 import tweepy
 
+
 def get_valid_api():
     while True:
         try:
@@ -14,7 +15,7 @@ def get_valid_api():
             # Construct the api instance
             api = tweepy.API(auth)
 
-            #will throw an exception if invalid, otherwise return api instance
+            # will throw an exception if invalid, otherwise return api instance
             api.verify_credentials()
         except:
             print("Invalid Credentials, please try again \n")
@@ -23,11 +24,5 @@ def get_valid_api():
 
 
 if __name__ == "__main__":
-    #get valid tweepy api instance
+    # get valid tweepy api instance
     api = get_valid_api()
-
-
-
-
-
-
