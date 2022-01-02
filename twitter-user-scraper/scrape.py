@@ -1,8 +1,9 @@
 import tweepy
 
 
-def get_valid_api():
+def configure_api():
     while True:
+        print("Please enter the following information to access Twitter API")
         try:
             consumer_key = input("Please enter Consumer Key \n").strip()
             consumer_secret = input("Please enter Consumer Secret Key \n").strip()
@@ -25,4 +26,20 @@ def get_valid_api():
 
 if __name__ == "__main__":
     # get valid tweepy api instance
-    api = get_valid_api()
+    api = configure_api()
+    api.lookup_users('elon_musk')
+    # begin command line application
+
+    questions = ['Find User', 'Save to CSV File', 'Import from CSV', 'Terminate Program']
+    while True:
+        print('Please enter number corresponding to your choice in the command line')
+        for i, option in enumerate(questions, start=1):
+            print('(', i, ') ', option)
+        c = input().strip()
+        if (c == '1'):
+            continue
+        elif (c == '4'):
+            break
+
+
+
