@@ -11,7 +11,7 @@ def configure_api():
             access_token = input("Please enter Access Token \n").strip()
             access_token_secret = input("Please enter Access Token Secret \n").strip()
 
-
+           
 
             auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
             auth.set_access_token(access_token, access_token_secret)
@@ -27,22 +27,15 @@ def configure_api():
             return api
 
 
-def find_user(api, queried_users):
-    username = input("Please enter the username of the user whose data you would like to collect "
-                     "(@ symbol not required)\n").strip()
+def find_user(username, queried_users):
     # remove @ char if included in username input
     if username.find('@') != -1:
         username = username.replace('@', '', 1)
-    # if user has already been queried, print username and return
+    # if user has already been queried, print user info and return
     for user in queried_users:
         if user.username == username:
-            print(user.__str__())
-            return
-    # create and return new user
-    new_user = create_user(api, username)
-    if (new_user != None):
-        print(new_user.__str__())
-        return new_user
+            return user
+    return None
 
 
 def create_user(api, username):
@@ -52,15 +45,14 @@ def create_user(api, username):
         user = api.get_user(screen_name=username)
     except:
         print("Invalid Username please try again")
-        return
     else:
+        # instantiate new user info
         new_user = User(username)
         new_user.id_str = user.id_str
         new_user.name = user.name
         new_user.created_at = user.created_at
         new_user.protected = user.protected
-        # check if user.location, user.description are non empty
-        if user.location:
+        if user.location:  # check if user.location, user.description are non empty
             new_user.location = user.location
         if user.description:
             new_user.description = user.description
@@ -68,13 +60,15 @@ def create_user(api, username):
         new_user.followers_count = user.followers_count
         new_user.friends_count = user.friends_count
         new_user.withheld_in_countries = user.withheld_in_countries
+
+        # get 20 most recent followers
+        # for follower in tweepy.Cursor(api.friends, new_user.username).items(20):
         return new_user
 
 
 if __name__ == "__main__":
     # get valid tweepy api instance
     api = configure_api()
-
 
     # begin command line application
     questions = ['Find User', 'Save to CSV File', 'Import from CSV', 'Terminate Program']
@@ -85,11 +79,18 @@ if __name__ == "__main__":
         print('Please enter number corresponding to your choice in the command line')
         for i, option in enumerate(questions, start=1):
             print('(', i, ') ', option)
+
         c = input().strip()
-        if (c == '1'):
-            user = find_user(api, queried_users)
-            if user != None:
+        if c == '1':
+            username = input("Please enter the username of the user whose data you would like to collect "
+                             "(@ char not required)\n").strip()
+            user = find_user(username, queried_users)
+            if user is None: # if user has not been queried, create new user
+                user = create_user(api, username)
+                if user is None: # if improper username credentials, continue application
+                    continue
                 queried_users.append(user)
+            print(user.__str__())
         elif (c == '4'):
             quit()
         print(len(queried_users))

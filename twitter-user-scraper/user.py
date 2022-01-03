@@ -11,6 +11,7 @@ class User:
         self.followers_count = 0
         self.friends_count = 0
         self.withheld_in_countries = []
+        self.friends = []
 
     # returns string information about user to be printed to console
     def __str__(self):
