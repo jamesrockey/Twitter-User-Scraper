@@ -1,4 +1,5 @@
 import tweepy
+import time
 from user import User
 
 
@@ -11,13 +12,11 @@ def configure_api():
             access_token = input("Please enter Access Token \n").strip()
             access_token_secret = input("Please enter Access Token Secret \n").strip()
 
-           
-
             auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
             auth.set_access_token(access_token, access_token_secret)
 
             # Construct the api instance
-            api = tweepy.API(auth)
+            api = tweepy.API(auth, wait_on_rate_limit=True)
 
             # will throw an exception if invalid, otherwise return api instance
             api.verify_credentials()
@@ -47,8 +46,9 @@ def create_user(api, username):
         print("Invalid Username please try again")
     else:
         # instantiate new user info
-        new_user = User(username)
+        new_user = User()
         new_user.id_str = user.id_str
+        new_user.username = user.screen_name
         new_user.name = user.name
         new_user.created_at = user.created_at
         new_user.protected = user.protected
@@ -60,9 +60,15 @@ def create_user(api, username):
         new_user.followers_count = user.followers_count
         new_user.friends_count = user.friends_count
         new_user.withheld_in_countries = user.withheld_in_countries
+        # add 20 most recent follower's usernames
+        for friend in user.friends():
+            new_user.recent_friends.append(friend.screen_name)
+        for follower in user.followers():
+            new_user.recent_followers.append(follower.screen_name)
 
-        # get 20 most recent followers
-        # for follower in tweepy.Cursor(api.friends, new_user.username).items(20):
+
+        # for friend in tweepy.Cursor(api.get_friends, screen_name=new_user.username).items():
+        #     new_user.friends.append(friend.screen_name)
         return new_user
 
 
