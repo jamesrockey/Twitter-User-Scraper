@@ -1,5 +1,6 @@
 import tweepy
 import time
+import webbrowser
 from user import User
 
 
@@ -7,18 +8,14 @@ def configure_api():
     while True:
         print("Please enter the following information to access Twitter API")
         try:
-            # consumer_key = input("Please enter Consumer Key \n").strip()
-            # consumer_secret = input("Please enter Consumer Secret Key \n").strip()
-            # access_token = input("Please enter Access Token \n").strip()
-            # access_token_secret = input("Please enter Access Token Secret \n").strip()
-
             consumer_key = "Kjc7UDsZHzWfd4deChQC93jYz"
             consumer_secret = "CzQ5yzUSHpMin7cSUPWOGzOiKyLRxPgHg9zPUohHMQ8jBGl7Mz"
-            access_token = "1475541055084937219-oDLFr86cjzrj1Uwf2CQQhg3r0slKSa"
-            access_token_secret = "xwdxwlx28W9piyrt1QHKtmKDmchRQjdnh06yWBNAF1W5U"
-
-            auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-            auth.set_access_token(access_token, access_token_secret)
+            callback_uri = 'oob'
+            auth = tweepy.OAuthHandler(consumer_key, consumer_secret, callback_uri)
+            redirect_url = auth.get_authorization_url()
+            webbrowser.open(redirect_url)
+            user_pin_input = input("Please enter pin from Twitter verification\n").strip()
+            auth.get_access_token(user_pin_input)
 
             # Construct the api instance
             api = tweepy.API(auth, wait_on_rate_limit=True)
@@ -61,6 +58,12 @@ def create_user(api, username):
                 new_user.recent_friends.append(friend.screen_name)
             for follower in user.followers():
                 new_user.recent_followers.append(follower.screen_name)
+
+            timeline = user.timeline()
+            for i, status in enumerate(timeline):
+                if i == 0:
+                    print(status.__str__())
+                    print(dir(status))
             return new_user
         return new_user
 
