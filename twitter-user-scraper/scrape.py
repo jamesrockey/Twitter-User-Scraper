@@ -77,15 +77,14 @@ def create_user(api, username):
 
 
 
-def save_to_JSON(queried_users):
+def save_to_json(queried_users):
     path = 'user_data.json'
     jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
     json_str = jsonpickle.encode(queried_users)
     with open(path, 'w') as outfile:
         outfile.write(json_str)
-    outfile.close()
 
-def load_from_JSON():
+def load_from_json():
     path = 'user_data.json'
     queried_users = []
     with open(path, 'r') as infile:
@@ -94,14 +93,12 @@ def load_from_JSON():
             queried_users = jsonpickle.decode(data)
         except:
             print("Failed to load users, please clear the file and start searches again")
-    infile.close()
     return queried_users
 
-def clear_JSON_file():
+def clear_json_file():
     path = 'user_data.json'
     with open(path, 'w') as outfile:
         outfile.truncate()
-    outfile.close()
 
 def update_queries(api, queried_users):
     updated_users = []
@@ -117,12 +114,13 @@ if __name__ == "__main__":
     api = configure_api()
 
     # begin command line application
-    questions = ['Find User', 'Save to .JSON', 'Import from JSON', 'Clear saved queries JSON file', 'Terminate Program']
+    questions = ['Find User', 'Save to JSON', 'Import from JSON', 'Clear JSON File',
+                 'Update Users', 'Terminate Program']
 
     # list of queried users from current
     queried_users = []
     while True:
-        print('Please enter number corresponding to your choice in the command line')
+        print('\nPlease enter number corresponding to your choice in the command line')
         for i, option in enumerate(questions, start=1):
             print('(', i, ') ', option)
 
@@ -133,19 +131,26 @@ if __name__ == "__main__":
             username = input("Please enter the username of the user whose data you would like to collect "
                              "(@ char not required)\n").strip()
             user = find_user(username, queried_users)
-            if user is None: # if user has not been queried, create new user
+            if user is None:
+                # if user has not been queried, create new user
                 user = create_user(api, username)
-                if user is None: # if improper username credentials, continue application
+                if user is None:
+                    # if improper username credentials, continue application
                     continue
-                queried_users.append(user)
+                else:
+                    queried_users.append(user)
             print(user.__str__())
         elif c == '2':
-            save_to_JSON(queried_users)
+            # save list of queried_users to json file
+            save_to_json(queried_users)
         elif c == '3':
-            queried_users = load_from_JSON()
+            # load queried_users list from json file
+            queried_users = load_from_json()
         elif c == '4':
-            clear_JSON_file()
+            # erase contents of json file
+            clear_json_file()
         elif c == '5':
+            # update all queried users with latest information
             queried_users = update_queries(api, queried_users)
         elif c == '6':
             quit()
