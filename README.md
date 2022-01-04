@@ -43,6 +43,7 @@ In it's current implementation, this scraper tool maximizes the number of unique
 - User's 20 most recent tweets
 
 From this information, other useful information such as N most rewteeted original posts, N most retweeted tweets, and favorite hashtag are created.
+
 Sample scrape from user @elonmusk:
 <img width="1512" alt="twitter-usr-scraper" src="https://user-images.githubusercontent.com/64109348/148131930-7d09e9a3-44b0-452c-a58c-0caa07d01358.png">
 
