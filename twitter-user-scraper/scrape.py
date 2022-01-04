@@ -2,11 +2,11 @@ import tweepy
 import time
 import webbrowser
 from user import User
+from tweet import Tweet
 
 
 def configure_api():
     while True:
-        print("Please enter the following information to access Twitter API")
         try:
             consumer_key = "Kjc7UDsZHzWfd4deChQC93jYz"
             consumer_secret = "CzQ5yzUSHpMin7cSUPWOGzOiKyLRxPgHg9zPUohHMQ8jBGl7Mz"
@@ -43,7 +43,7 @@ def create_user(api, username):
     # check if username is exists
     user = None
     try:
-        user = api.get_user(screen_name=username)
+        user = api.get_user(screen_name=username, tweet_mode='extended')
     except:
         print("Invalid Username please try again")
     else:
@@ -61,10 +61,13 @@ def create_user(api, username):
 
             timeline = user.timeline()
             for i, status in enumerate(timeline):
+                tweet = Tweet(status.id_str, status.text, status.user.screen_name, status.author.screen_name,
+                              status.favorite_count, status.retweet_count)
                 if i == 0:
-                    print(status.__str__())
-                    print(dir(status))
-            return new_user
+                    r = status.retweets
+                    print(type(r))
+                    print(r)
+                new_user.recent_tweets.append(tweet)
         return new_user
 
 if __name__ == "__main__":

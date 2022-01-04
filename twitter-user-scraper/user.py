@@ -15,6 +15,7 @@ class User:
         self.withheld_in_countries = withheld_in_countries
         self.recent_followers = []
         self.recent_friends = []
+        self.recent_tweets = []
 
     # returns string information about user to be printed to console
     def __str__(self):
@@ -24,6 +25,7 @@ class User:
         banned = self.withheld_in_countries
         recent_followers = self.recent_followers
         recent_friends = self.recent_friends
+        recent_tweets = self.recent_tweets
         if not location:
             location = 'N/A'
         if not description:
@@ -34,6 +36,8 @@ class User:
             recent_followers.append('N/A')
         if self.friends_count == 0:
             recent_friends.append('N/A')
+        if len(self.recent_tweets) == 0:
+            recent_tweets.append("N/A")
         lst = ["Time last updated: " + str(self.scrape_time), "ID: " + self.id_str, "Username: " + self.username, "Name: " + self.name,
                "Account created at: " + str(self.created_at),
                "Tweets_is_private: " + str(self.protected), "Location: " + location,
@@ -41,6 +45,7 @@ class User:
                "Followers count: " + str(self.followers_count), "Friend count: " + str(self.friends_count),
                "Content withheld in countries: " + ", ".join(str(elem) for elem in banned),
                "Recent followers: " + ", ".join(str(elem) for elem in recent_followers),
-               "Recent friends: " + ", ".join(str(elem) for elem in recent_friends)]
+               "Recent friends: " + ", ".join(str(elem) for elem in recent_friends),
+               "Recent tweets: " + "\n \n".join(tweet.__str__() for tweet in self.recent_tweets)]
 
         return "\n".join(lst)
