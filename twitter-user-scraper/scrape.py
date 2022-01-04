@@ -63,12 +63,14 @@ def create_user(api, username):
             for i, status in enumerate(timeline):
                 tweet = Tweet(status.id_str, status.text, status.user.screen_name, status.author.screen_name,
                               status.favorite_count, status.retweet_count)
-                if i == 0:
-                    r = status.retweets
-                    print(type(r))
-                    print(r)
                 new_user.recent_tweets.append(tweet)
+            new_user.most_retweeted_posts = new_user.update_N_most_retweeted(3, is_retweet=False)
+            new_user.most_retweeted_retweets = new_user.update_N_most_retweeted(3, is_retweet=True)
         return new_user
+
+
+
+
 
 if __name__ == "__main__":
     # get valid tweepy api instance

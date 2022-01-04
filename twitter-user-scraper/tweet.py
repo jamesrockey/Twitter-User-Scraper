@@ -9,11 +9,9 @@ class Tweet:
         self.url = "https://twitter.com/twitter/statuses/" + id
         self.is_retweet: bool
         # check text to see if post is retweet
-        try:
-            if text.find('RT @') == 0:
-                self.is_retweet = True
-        except:
-            self.is_retweet = False
+
+        if text.find('RT @') == 0:
+            self.is_retweet = True
         else:
             self.is_retweet = False
 
