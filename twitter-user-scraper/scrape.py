@@ -1,5 +1,6 @@
 import tweepy
 import time
+import jsonpickle
 import webbrowser
 from user import User
 from tweet import Tweet
@@ -64,11 +65,46 @@ def create_user(api, username):
                 tweet = Tweet(status.id_str, status.text, status.user.screen_name, status.author.screen_name,
                               status.favorite_count, status.retweet_count)
                 new_user.recent_tweets.append(tweet)
-            new_user.most_retweeted_posts = new_user.update_N_most_retweeted(3, is_retweet=False)
-            new_user.most_retweeted_retweets = new_user.update_N_most_retweeted(3, is_retweet=True)
+            # update user's N most retweeted posts/retweets
+            new_user.update_N_most_retweeted(3, is_retweet=False)
+            new_user.update_N_most_retweeted(3, is_retweet=True)
+            new_user.find_most_common_tag()
         return new_user
 
 
+
+def save_to_JSON(queried_users):
+    path = 'user_data.json'
+    jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
+    json_str = jsonpickle.encode(queried_users)
+    with open(path, 'w') as outfile:
+        outfile.write(json_str)
+    outfile.close()
+
+def load_from_JSON():
+    path = 'user_data.json'
+    queried_users = []
+    with open(path, 'r') as infile:
+        try:
+            data = infile.read()
+            queried_users = jsonpickle.decode(data)
+        except:
+            print("Failed to load users, please clear the file and start searches again")
+    infile.close()
+    return queried_users
+
+def clear_JSON_file():
+    path = 'user_data.json'
+    with open(path, 'w') as outfile:
+        outfile.truncate()
+    outfile.close()
+
+def update_queries(api, queried_users):
+    updated_users = []
+    for user in queried_users:
+        new_user = create_user(api, user.username)
+        updated_users.append(new_user)
+    return updated_users
 
 
 
@@ -77,7 +113,7 @@ if __name__ == "__main__":
     api = configure_api()
 
     # begin command line application
-    questions = ['Find User', 'Save to CSV File', 'Import from CSV', 'Terminate Program']
+    questions = ['Find User', 'Save to .JSON', 'Import from JSON', 'Clear saved queries JSON file', 'Terminate Program']
 
     # list of queried users from current
     queried_users = []
@@ -88,6 +124,8 @@ if __name__ == "__main__":
 
         c = input().strip()
         if c == '1':
+            # print usernames of already queried users
+            print("Queried users: " + ", ".join(user.username for user in queried_users))
             username = input("Please enter the username of the user whose data you would like to collect "
                              "(@ char not required)\n").strip()
             user = find_user(username, queried_users)
@@ -97,6 +135,13 @@ if __name__ == "__main__":
                     continue
                 queried_users.append(user)
             print(user.__str__())
-        elif (c == '4'):
+        elif c == '2':
+            save_to_JSON(queried_users)
+        elif c == '3':
+            queried_users = load_from_JSON()
+        elif c == '4':
+            clear_JSON_file()
+        elif c == '5':
+            queried_users = update_queries(api, queried_users)
+        elif c == '6':
             quit()
-        print(len(queried_users))

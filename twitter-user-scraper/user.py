@@ -18,22 +18,21 @@ class User:
         self.recent_tweets = []
         self.most_retweeted_posts = []
         self.most_retweeted_retweets = []
+        self.favorite_tag = None
 
     # returns string information about user to be printed to console
     def __str__(self):
-        # check for missing location, description, and withheld countries
-        location = self.location
-        description = self.description
-        banned = self.withheld_in_countries
-        recent_followers = self.recent_followers
-        recent_friends = self.recent_friends
-        recent_tweets = self.recent_tweets
-        most_retweeted_posts = self.most_retweeted_posts
-        most_retweeted_retweets = self.most_retweeted_retweets
-        if not location:
-            location = 'N/A'
-        if not description:
-            description = 'N/A'
+        # print N/A if any of these fields are empty
+        banned = self.withheld_in_countries.copy()
+        recent_followers = self.recent_followers.copy()
+        recent_friends = self.recent_friends.copy()
+        recent_tweets = self.recent_tweets.copy()
+        most_retweeted_posts = self.most_retweeted_posts.copy()
+        most_retweeted_retweets = self.most_retweeted_retweets.copy()
+        if not self.location:
+            self.location = 'N/A'
+        if not self.description:
+            self.description = 'N/A'
         if len(banned) == 0:
             banned.append('N/A')
         if self.followers_count == 0:
@@ -46,22 +45,26 @@ class User:
             most_retweeted_posts.append('N/A')
         if len(self.most_retweeted_retweets) == 0:
             most_retweeted_retweets.append('N/A')
+        if not self.favorite_tag:
+            self.favorite_tag = 'N/A'
         lst = ["Time last updated: " + str(self.scrape_time), "ID: " + self.id_str, "Username: " + self.username, "Name: " + self.name,
                "Account created at: " + str(self.created_at),
-               "Tweets_is_private: " + str(self.protected), "Location: " + location,
-               "Description: " + description, "Verified: " + str(self.verified),
+               "Tweets_is_private: " + str(self.protected), "Location: " + self.location,
+               "Description: " + self.description, "Verified: " + str(self.verified),
                "Followers count: " + str(self.followers_count), "Friend count: " + str(self.friends_count),
                "Content withheld in countries: " + ", ".join(str(elem) for elem in banned),
                "Recent followers: " + ", ".join(str(elem) for elem in recent_followers),
                "Recent friends: " + ", ".join(str(elem) for elem in recent_friends),
-               "Most retweeted posts: \n" + "\n \n".join(tweet.__str__() for tweet in most_retweeted_posts),
-               "\nMost retweeted retweets: \n" + "\n \n".join(tweet.__str__() for tweet in most_retweeted_retweets)]
+               "Favorite Hashtag: " + self.favorite_tag,
+               "Most retweeted posts: \n\n" + "\n \n".join(tweet.__str__() for tweet in most_retweeted_posts),
+               "\nMost retweeted retweets: \n\n" + "\n \n".join(tweet.__str__() for tweet in most_retweeted_retweets)]
+
 
         return "\n".join(lst)
 
     def update_N_most_retweeted(self, N, is_retweet):
         # finds N posts with most retweets, original posts and retweeted
-        tweets = self.recent_tweets
+        tweets = self.recent_tweets.copy()
         max_tweets = []
         if len(tweets) < N:
             N = len(tweets)
@@ -75,4 +78,30 @@ class User:
             if max_tweet:
                 max_tweets.append(max_tweet)
                 tweets.remove(max_tweet)
-        return max_tweets
+        if (is_retweet):
+            self.most_retweeted_retweets = max_tweets
+        else:
+            self.most_retweeted_posts = max_tweets
+
+    def find_all_hashtags(self):
+        if not self.protected:
+            tags_to_occurrence = {}
+            # find all hashtags
+            for tweet in self.recent_tweets:
+                for word in tweet.text.split():
+                    if word.startswith("#"):
+                        if word in tags_to_occurrence:
+                            tags_to_occurrence[word] += 1
+                        else:
+                            tags_to_occurrence[word] = 1
+        return tags_to_occurrence
+
+    def find_most_common_tag(self):
+        tags_to_occurrence = self.find_all_hashtags()
+        max_occurrence = 0
+        favorite_tag = ''
+        for key in tags_to_occurrence.keys():
+            if tags_to_occurrence[key] > max_occurrence:
+                max_occurrence = tags_to_occurrence[key]
+                favorite_tag = key
+        self.favorite_tag = favorite_tag
