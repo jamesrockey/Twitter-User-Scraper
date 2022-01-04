@@ -15,7 +15,8 @@ def configure_api():
             auth = tweepy.OAuthHandler(consumer_key, consumer_secret, callback_uri)
             redirect_url = auth.get_authorization_url()
             webbrowser.open(redirect_url)
-            user_pin_input = input("Please enter pin from Twitter verification\n").strip()
+            user_pin_input = input("Please enter pin from Twitter verification\n").strip().lower()
+
             auth.get_access_token(user_pin_input)
 
             # Construct the api instance
@@ -24,7 +25,10 @@ def configure_api():
             # will throw an exception if invalid, otherwise return api instance
             api.verify_credentials()
         except:
-            print("Invalid Credentials, please try again \n")
+            user_input = input('You have entered incorrect credentials. If you would like to exit '
+                               'the application type "EXIT", or press any key to try again.\n').strip().lower()
+            if user_input == 'exit':
+                quit()
         else:
             return api
 
