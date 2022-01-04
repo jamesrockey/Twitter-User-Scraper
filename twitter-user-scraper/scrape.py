@@ -53,7 +53,6 @@ def create_user(api, username):
         print("Invalid Username please try again")
     else:
         # instantiate new user info
-
         new_user = User(time.asctime(), user.id_str, user.screen_name, user.name, user.created_at, user.protected,
                         user.location, user.description, user.verified, user.followers_count, user.friends_count,
                         user.withheld_in_countries)
@@ -69,9 +68,7 @@ def create_user(api, username):
                 tweet = Tweet(status.id_str, status.text, status.user.screen_name, status.author.screen_name,
                               status.favorite_count, status.retweet_count)
                 new_user.recent_tweets.append(tweet)
-            # update user's N most retweeted posts/retweets
-            new_user.update_N_most_retweeted(3, is_retweet=False)
-            new_user.update_N_most_retweeted(3, is_retweet=True)
+            # update most common tag
             new_user.find_most_common_tag()
         return new_user
 

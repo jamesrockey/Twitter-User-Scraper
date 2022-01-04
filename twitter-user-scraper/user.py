@@ -16,9 +16,6 @@ class User:
         self.recent_followers = []
         self.recent_friends = []
         self.recent_tweets = []
-        self.most_retweeted_posts = []
-        self.most_retweeted_retweets = []
-        self.favorite_tag = None
 
     # returns string information about user to be printed to console
     def __str__(self):
@@ -27,8 +24,10 @@ class User:
         recent_followers = self.recent_followers.copy()
         recent_friends = self.recent_friends.copy()
         recent_tweets = self.recent_tweets.copy()
-        most_retweeted_posts = self.most_retweeted_posts.copy()
-        most_retweeted_retweets = self.most_retweeted_retweets.copy()
+        # 3 most retweeted original posts/retweets
+        most_retweeted_posts = self.find_N_most_retweeted(3, is_retweet=False)
+        most_retweeted_retweets = self.find_N_most_retweeted(3, is_retweet=True)
+        favorite_tag = self.find_most_common_tag()
         if not self.location:
             self.location = 'N/A'
         if not self.description:
@@ -41,11 +40,11 @@ class User:
             recent_friends.append('N/A')
         if len(self.recent_tweets) == 0:
             recent_tweets.append("N/A")
-        if len(self.most_retweeted_posts) == 0:
+        if len(most_retweeted_posts) == 0:
             most_retweeted_posts.append('N/A')
-        if len(self.most_retweeted_retweets) == 0:
+        if len(most_retweeted_retweets) == 0:
             most_retweeted_retweets.append('N/A')
-        if not self.favorite_tag:
+        if len(favorite_tag) == 0:
             self.favorite_tag = 'N/A'
         lst = ["Time last updated: " + str(self.scrape_time), "ID: " + self.id_str, "Username: " + self.username, "Name: " + self.name,
                "Account created at: " + str(self.created_at),
@@ -55,14 +54,14 @@ class User:
                "Content withheld in countries: " + ", ".join(str(elem) for elem in banned),
                "Recent followers: " + ", ".join(str(elem) for elem in recent_followers),
                "Recent friends: " + ", ".join(str(elem) for elem in recent_friends),
-               "Favorite Hashtag: " + self.favorite_tag,
+               "Favorite Hashtag: " + favorite_tag,
                "Most retweeted posts: \n\n" + "\n \n".join(tweet.__str__() for tweet in most_retweeted_posts),
                "\nMost retweeted retweets: \n\n" + "\n \n".join(tweet.__str__() for tweet in most_retweeted_retweets)]
 
 
         return "\n".join(lst)
 
-    def update_N_most_retweeted(self, N, is_retweet):
+    def find_N_most_retweeted(self, N, is_retweet):
         # finds N posts with most retweets, original posts and retweeted
         tweets = self.recent_tweets.copy()
         max_tweets = []
@@ -78,10 +77,8 @@ class User:
             if max_tweet:
                 max_tweets.append(max_tweet)
                 tweets.remove(max_tweet)
-        if (is_retweet):
-            self.most_retweeted_retweets = max_tweets
-        else:
-            self.most_retweeted_posts = max_tweets
+        return max_tweets
+
 
     def find_all_hashtags(self):
         if not self.protected:
@@ -104,4 +101,4 @@ class User:
             if tags_to_occurrence[key] > max_occurrence:
                 max_occurrence = tags_to_occurrence[key]
                 favorite_tag = key
-        self.favorite_tag = favorite_tag
+        return favorite_tag
