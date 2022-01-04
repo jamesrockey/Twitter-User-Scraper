@@ -44,6 +44,8 @@ In it's current implementation, this scraper tool maximizes the number of unique
 
 From this information, other useful information such as N most rewteeted original posts, N most retweeted tweets, and favorite hashtag are created.
 
+<img width="1512" alt="twitter-usr-scraper" src="https://user-images.githubusercontent.com/64109348/148131930-7d09e9a3-44b0-452c-a58c-0caa07d01358.png">
+
 ## **Resources**
 - Feel free to reach me at jmsneilrock@gmail.com with any questions or suggestions!
 
