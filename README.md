@@ -1,5 +1,5 @@
 # Twitter User Scraper
-Twitter User Scraper is a command line application that utilizes Twitter's API through the tweepy package using as little api calls as possible. This application also uses the jsonpickle package to save and load user data to a json file.
+Twitter User Scraper is a command line application that utilizes Twitter's API to gather public information on twitter users by username. Popular uses of this project include sentimental analysis for trading, as well as exploring your friend's social networks.
 
 Installation
 ------------
